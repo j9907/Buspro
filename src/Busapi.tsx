@@ -1,65 +1,31 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 
 function Busapi() {
-  
- 
-  const SERVICE_KEY = '5tWSCDMFUyIaWSo2TW6yMvkgjMPBaFWxCtT%2BLqJpZSrGa3Y2NtN%2FLyAQmZ%2BJl%2BpjjEO1SL5pp0YIQ6CzNH%2Bgxg%3D%3D'
-  
+  const [data, setData] = useState(null); // 데이터를 저장할 상태
 
-// function clickdata():any{
-//     axios.get('http://openapi.changwon.go.kr/rest/bis/Station/',{params})
-//     .then(response => {
-//         console.log(response.data)
-//     })
-// }
+  useEffect(() => {
+    // 컴포넌트가 마운트될 때 비동기 요청을 실행
+    const getXMLData = async () => {
+      // Axios 인스턴스를 사용해 XML 데이터 요청
+      const response : any = await axios('/main');
+      console.log(response);
+      setData(response.data); // 응답을 상태에 저장
+    };
 
-const axios = require('axios');
-const xml2js = require('xml2js'); // XML 응답을 다루기 위해 xml2js 패키지도 사용
-
-// Axios 인스턴스 생성
-const instance = axios.create({
-  baseURL: 'http://openapi.changwon.go.kr/rest/bis/Station/',
-});
-
-const getXMLData : any = async () => {
-  try {
-    // Axios 인스턴스를 사용해 XML 데이터 요청
-    const response = await instance.get(`http://openapi.changwon.go.kr/rest/bis/Station/?serviceKey=${encodeURIComponent(SERVICE_KEY)}`, {
-      headers: {
-        // 서버가 요구하는 경우 Accept 헤더 설정
-        'Accept': 'application/xml'
-      }
-    });
-
-    // xml2js를 사용하여 XML 응답을 JSON으로 변환
-    xml2js.parseString(response.data, (err:any, result:any) => {
-      if (err) {
-        throw err;
-      }
-
-      // 변환된 JSON 데이터 출력
-      console.log(result);
-    });
-  } catch (error) {
-    // 에러 처리
-    console.error(error);
-  }
-};
-
-// 함수 실행
-
-
+    getXMLData(); // 함수 실행
+  }, []); // 빈 배열을 전달해 컴포넌트가 마운트될 때만 실행되도록 함
 
   return (
     <div className="App">
       <header className="App-header">
-          <div>
-            <button onClick={getXMLData()}>API</button>
-          </div>
+        <div>
+          {/* 데이터가 있을 경우에만 렌더링 */}
+          {data ? <div>{JSON.stringify(data)}</div> : <div>Loading...</div>}
+        </div>
       </header>
     </div>
   );
